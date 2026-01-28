@@ -16,4 +16,10 @@
     <group>authentication_failed,pci_dss_10.2.4,pci_dss_10.2.5,</group>
   </rule>
 
+  <rule id="100002" level="5">
+   <decoded_as>json</decoded_as>
+   <description>Sprint 1: Test Rule Verification</description>
+   <match>test_wazuh_rule1</match>
+  </rule>
+
 </group>
