@@ -1,0 +1,13 @@
+
+<group name="nozomi,nozomi_cef,">
+
+  <!-- ============================================
+       BASE RULE: Catch all Nozomi CEF events
+       ============================================ -->
+  <rule id="100600" level="3">
+    <decoded_as>nozomi-cef</decoded_as>
+    <description>Nozomi Networks: CEF alert received - $(cef.name)</description>
+    <group>nozomi_alert,</group>
+  </rule>
+
+</group>
