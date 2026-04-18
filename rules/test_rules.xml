@@ -1,0 +1,9 @@
+<group name="test_group,">
+
+  <rule id="100005" level="5">
+    <decoded_as>json</decoded_as>
+    <description>Mock Rule: This is a test alert for Sprint 1</description>
+    <match>trigger_mock_alert</match>
+  </rule>
+
+</group>
