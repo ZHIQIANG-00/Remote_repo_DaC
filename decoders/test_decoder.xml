@@ -1,3 +1,0 @@
-<decoder name="test_decoder_placeholder">
-    <prematch>this_will_never_match</prematch>
-</decoder>
