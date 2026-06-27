@@ -1,23 +1,36 @@
 # Example behavioral tests. Add one file per data source / rule group.
 
-- name: "SSH invalid user fires built-in 5710"
-  log: "Oct 15 21:07:00 linux-agent sshd[29205]: Invalid user blimey from 18.18.18.18 port 48928"
+# Behavioral tests for the rules in rules/local_rules.xml
+
+# Rule 100001: fires when parent rule 5716 (sshd auth failed) fires AND the
+# source IP is 1.1.1.1. The sample log below is the one Wazuh suggests in the
+# comment inside local_rules.xml.
+- name: "Failed SSH auth from 1.1.1.1 fires custom 100001"
+  log: "Dec 10 01:02:02 host sshd[1234]: Failed none for root from 1.1.1.1 port 1066 ssh2"
   expect:
-    rule_id: "5710"
+    rule_id: "100001"
     min_level: 5
-    decoder: "sshd"
     groups: ["authentication_failed"]
 
-- name: "Accepted SSH login is decoded but stays low severity"
-  log: "Oct 15 21:09:00 linux-agent sshd[29300]: Accepted password for alice from 10.0.0.9 port 50122 ssh2"
+# Rule 100002: fires on a JSON log that contains the text "test_wazuh_rule1"
+# (decoded_as json + match). Adjust the JSON below if your real source differs.
+- name: "JSON log with test_wazuh_rule1 fires custom 100002"
+  log: '{"message":"test_wazuh_rule1"}'
   expect:
-    decoder: "sshd"
-    max_level: 5
+    rule_id: "100002"
+    decoder: "json"
 
-- name: "Random noise should not raise an alert"
-  log: "Oct 15 21:10:00 linux-agent kernel: usb 1-1: new high-speed USB device"
+# Negative test: an ordinary failed auth from a DIFFERENT IP should still fire
+# the built-in sshd rule, but NOT your IP-specific custom rule 100001.
+- name: "Failed SSH auth from another IP does not fire 100001"
+  log: "Dec 10 01:03:02 host sshd[1234]: Failed none for root from 8.8.8.8 port 1066 ssh2"
+  expect:
+    rule_id: "5716"
+
+# Negative test: unrelated noise should raise nothing at all.
+- name: "Unrelated kernel log raises no alert"
+  log: "Dec 10 01:05:00 host kernel: usb 1-1: new high-speed USB device"
   expect_no_rule: true
-  
 
 # --- Custom-rule example -----------------------------------------------------
 # Uncomment once rules/local_rules.xml defines rule 100001 (failed SSH from a
