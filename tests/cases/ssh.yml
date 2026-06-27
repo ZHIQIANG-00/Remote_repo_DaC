@@ -27,10 +27,12 @@
   expect:
     rule_id: "5716"
 
-# Negative test: unrelated noise should raise nothing at all.
+# Negative test: unrelated noise should raise no real alert. Wazuh may attach a
+# harmless level-0 grouping rule (e.g. 81100 "USB messages grouped."), which is
+# fine - expect_no_alert passes as long as nothing fires at level 1 or above.
 - name: "Unrelated kernel log raises no alert"
   log: "Dec 10 01:05:00 host kernel: usb 1-1: new high-speed USB device"
-  expect_no_rule: true
+  expect_no_alert: true
 
 
 # --- Custom-rule example -----------------------------------------------------

@@ -15,6 +15,7 @@ env:
   WAZUH_IMAGE: wazuh/wazuh-manager:4.12.0   # pin to the version you run in prod
   CONTAINER: wazuh-test
 
+
 jobs:
   logtest:
     runs-on: ubuntu-latest

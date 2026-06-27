@@ -22,7 +22,8 @@ Test case schema (a YAML list of mappings):
       max_level: 5                         # level must be <= this
       decoder:  "sshd"                     # matched decoder name
       groups:   ["authentication_failed"]  # these groups must all be present
-    expect_no_rule: false                  # set true to assert nothing fires
+    expect_no_rule: false                  # set true to assert NOTHING fires at all
+    expect_no_alert: false                 # set true to allow level-0 info rules but no real alert
 """
 
 import argparse
@@ -96,6 +97,17 @@ def check_case(result, case):
     if case.get("expect_no_rule", False):
         if rule is not None:
             failures.append(f"expected no rule, but {rule.get('id')} fired")
+        return failures
+
+    # "expect_no_alert" passes when nothing fires OR only an informational
+    # level-0 rule fires (e.g. Wazuh's harmless "USB messages grouped." rule).
+    # It fails only if a real, alert-level rule (level >= 1) matches.
+    if case.get("expect_no_alert", False):
+        if rule is not None and int(rule.get("level", 0)) >= 1:
+            failures.append(
+                f"expected no alert, but rule {rule.get('id')} "
+                f"fired at level {rule.get('level')}"
+            )
         return failures
 
     if rule is None:
