@@ -17,6 +17,7 @@
 - name: "Random noise should not raise an alert"
   log: "Oct 15 21:10:00 linux-agent kernel: usb 1-1: new high-speed USB device"
   expect_no_rule: true
+  
 
 # --- Custom-rule example -----------------------------------------------------
 # Uncomment once rules/local_rules.xml defines rule 100001 (failed SSH from a
