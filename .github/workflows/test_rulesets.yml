@@ -27,6 +27,7 @@ jobs:
           docker run -d --name "$CONTAINER" \
             --ulimit nofile=65536:65536 \
             --cap-add SYS_RESOURCE \
+            -p 55000:55000 \
             "$WAZUH_IMAGE"
           # logtest needs wazuh-analysisd up. Filebeat/indexer warnings in the
           # log are expected here and harmless — we only care about analysisd.
