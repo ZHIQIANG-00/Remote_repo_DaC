@@ -118,6 +118,7 @@ def main() -> int:
     if not files:
         print(f"No test files found under {args.tests}/ - nothing to check.")
         return 0
+    
 
     total = passed = 0
     for f in files:

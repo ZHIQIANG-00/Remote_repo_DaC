@@ -31,6 +31,7 @@
 - name: "Unrelated kernel log raises no alert"
   log: "Dec 10 01:05:00 host kernel: usb 1-1: new high-speed USB device"
   expect_no_rule: true
+  
 
 # --- Custom-rule example -----------------------------------------------------
 # Uncomment once rules/local_rules.xml defines rule 100001 (failed SSH from a
