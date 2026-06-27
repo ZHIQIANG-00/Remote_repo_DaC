@@ -1,0 +1,88 @@
+name: Test Rulesets with logtest
+
+# Behavioral test gate. Runs on PRs into main, alongside the existing
+# "Check Rule ID Conflicts" workflow. This one boots an ephemeral Wazuh
+# manager, loads the candidate ruleset, and asserts that sample logs fire
+# (or do NOT fire) the expected rules before the change is allowed to merge.
+
+on:
+  pull_request:
+    branches: ["main"]
+    paths: ["**.xml", "tests/**"]
+  workflow_dispatch:
+
+env:
+  WAZUH_IMAGE: wazuh/wazuh-manager:4.14.2   # pin to the version you run in prod
+  CONTAINER: wazuh-test
+
+jobs:
+  logtest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+
+      - name: Start ephemeral Wazuh manager
+        run: |
+          docker run -d --name "$CONTAINER" "$WAZUH_IMAGE"
+          # logtest needs wazuh-analysisd up. Filebeat/indexer warnings in the
+          # log are expected here and harmless — we only care about analysisd.
+          for i in $(seq 1 60); do
+            if docker exec "$CONTAINER" /var/ossec/bin/wazuh-control status \
+                 2>/dev/null | grep -q "analysisd is running"; then
+              echo "manager ready"; exit 0
+            fi
+            sleep 5
+          done
+          echo "::error::manager did not become ready in time"
+          docker logs "$CONTAINER" | tail -n 80
+          exit 1
+
+      - name: Load candidate decoders and rules
+        shell: bash
+        run: |
+          # Mirror the production layout used by the deploy workflow.
+          if compgen -G "decoders/*.xml" > /dev/null; then
+            docker cp decoders/. "$CONTAINER":/var/ossec/etc/decoders/
+          fi
+          if compgen -G "rules/*.xml" > /dev/null; then
+            docker cp rules/. "$CONTAINER":/var/ossec/etc/rules/
+          fi
+          docker exec "$CONTAINER" bash -c '
+            chown wazuh:wazuh /var/ossec/etc/decoders/* /var/ossec/etc/rules/* 2>/dev/null || true
+            chmod 660 /var/ossec/etc/decoders/* /var/ossec/etc/rules/* 2>/dev/null || true
+          '
+
+      - name: Restart to load ruleset (syntax / load check)
+        run: |
+          docker exec "$CONTAINER" /var/ossec/bin/wazuh-control restart || true
+          # Trust analysisd state, not the restart exit code: a bad rule file
+          # stops analysisd from coming back, which is exactly what we want to catch.
+          for i in $(seq 1 30); do
+            echo "----- wazuh-control status (attempt $i/30) -----"
+            STATUS=$(docker exec "$CONTAINER" /var/ossec/bin/wazuh-control status 2>/dev/null)
+            echo "$STATUS"          # full list of Wazuh services and their state
+            if echo "$STATUS" | grep -q "analysisd is running"; then
+              echo "✅ ruleset loaded — analysisd is up"
+              exit 0
+            fi
+            sleep 3
+          done
+          echo "::error::analysisd failed to load the ruleset — likely a syntax error"
+          docker exec "$CONTAINER" tail -n 80 /var/ossec/logs/ossec.log || true
+          exit 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install pyyaml
+
+      - name: Run logtest behavioral tests
+        run: python tests/logtest_runner.py --container "$CONTAINER" --tests tests/cases
+
+      - name: Dump manager log on failure
+        if: failure()
+        run: docker exec "$CONTAINER" tail -n 120 /var/ossec/logs/ossec.log || true

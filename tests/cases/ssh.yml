@@ -1,0 +1,30 @@
+# Example behavioral tests. Add one file per data source / rule group.
+
+- name: "SSH invalid user fires built-in 5710"
+  log: "Oct 15 21:07:00 linux-agent sshd[29205]: Invalid user blimey from 18.18.18.18 port 48928"
+  expect:
+    rule_id: "5710"
+    min_level: 5
+    decoder: "sshd"
+    groups: ["authentication_failed"]
+
+- name: "Accepted SSH login is decoded but stays low severity"
+  log: "Oct 15 21:09:00 linux-agent sshd[29300]: Accepted password for alice from 10.0.0.9 port 50122 ssh2"
+  expect:
+    decoder: "sshd"
+    max_level: 5
+
+- name: "Random noise should not raise an alert"
+  log: "Oct 15 21:10:00 linux-agent kernel: usb 1-1: new high-speed USB device"
+  expect_no_rule: true
+
+# --- Custom-rule example -----------------------------------------------------
+# Uncomment once rules/local_rules.xml defines rule 100001 (failed SSH from a
+# blacklisted IP). This is the kind of assertion that catches a regression when
+# someone edits the rule and accidentally breaks the match.
+#
+# - name: "Failed SSH from blacklisted IP raises custom 100001"
+#   log: "Oct 15 21:11:00 linux-agent sshd[29400]: Failed password for invalid user admin from 1.1.1.1 port 50999 ssh2"
+#   expect:
+#     rule_id: "100001"
+#     min_level: 7
