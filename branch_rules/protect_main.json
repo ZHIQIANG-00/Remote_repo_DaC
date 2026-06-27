@@ -48,6 +48,10 @@
           {
             "context": "check-rule-ids",
             "integration_id": 15368
+          },
+          {
+            "context": "logtest"
+            
           }
         ]
       }

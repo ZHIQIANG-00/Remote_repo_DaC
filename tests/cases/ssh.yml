@@ -1,0 +1,47 @@
+# Example behavioral tests. Add one file per data source / rule group.
+
+# Behavioral tests for the rules in rules/local_rules.xml
+
+# Rule 100001: fires when parent rule 5716 (sshd auth failed) fires AND the
+# source IP is 1.1.1.1. The sample log below is the one Wazuh suggests in the
+# comment inside local_rules.xml.
+- name: "Failed SSH auth from 1.1.1.1 fires custom 100001"
+  log: "Dec 10 01:02:02 host sshd[1234]: Failed none for root from 1.1.1.1 port 1066 ssh2"
+  expect:
+    rule_id: "100001"
+    min_level: 5
+    groups: ["authentication_failed"]
+
+# Rule 100002: fires on a JSON log that contains the text "test_wazuh_rule1"
+# (decoded_as json + match). Adjust the JSON below if your real source differs.
+- name: "JSON log with test_wazuh_rule1 fires custom 100002"
+  log: '{"message":"test_wazuh_rule1"}'
+  log_format: json
+  expect:
+    rule_id: "100002"
+
+# Negative test: an ordinary failed auth from a DIFFERENT IP should still fire
+# the built-in sshd rule, but NOT your IP-specific custom rule 100001.
+- name: "Failed SSH auth from another IP does not fire 100001"
+  log: "Dec 10 01:03:02 host sshd[1234]: Failed none for root from 8.8.8.8 port 1066 ssh2"
+  expect:
+    rule_id: "5716"
+
+# Negative test: unrelated noise should raise no real alert. Wazuh may attach a
+# harmless level-0 grouping rule (e.g. 81100 "USB messages grouped."), which is
+# fine - expect_no_alert passes as long as nothing fires at level 1 or above.
+- name: "Unrelated kernel log raises no alert"
+  log: "Dec 10 01:05:00 host kernel: usb 1-1: new high-speed USB device"
+  expect_no_alert: true
+
+
+# --- Custom-rule example -----------------------------------------------------
+# Uncomment once rules/local_rules.xml defines rule 100001 (failed SSH from a
+# blacklisted IP). This is the kind of assertion that catches a regression when
+# someone edits the rule and accidentally breaks the match.
+#
+# - name: "Failed SSH from blacklisted IP raises custom 100001"
+#   log: "Oct 15 21:11:00 linux-agent sshd[29400]: Failed password for invalid user admin from 1.1.1.1 port 50999 ssh2"
+#   expect:
+#     rule_id: "100001"
+#     min_level: 7
