@@ -189,6 +189,7 @@
 
 
 #!/usr/bin/env python3
+
 """
 logtest_runner.py - behavioral tests for Wazuh rules/decoders via the Wazuh API.
 

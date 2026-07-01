@@ -30,7 +30,7 @@
     
         <rule id="110005" level="2">
         <if_sid>110000</if_sid>
-        <field name="signature">VI:NEW-LINK-GROUP</field>
+        <field name="signature">^VI:NEW-LINK-GROUP$</field>
         <description>New communication group discovered</description>
         <group>inventory,</group>
     </rule>
@@ -93,7 +93,6 @@
         <description>Malformed network traffic detected</description>
         <group>network,protocol,</group>
     </rule>
-    
         <rule id="110104" level="12">
         <if_sid>110000</if_sid>
         <field name="signature">SIGN:MALWARE-DETECTED</field>
