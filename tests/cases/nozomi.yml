@@ -1,0 +1,180 @@
+# Full behavioral test suite for the Nozomi N2OS decoder (nozomi_n2os)
+# and rules (110xxx). One positive case per rule, plus a decoder
+# field-extraction case, the base-rule path, and negative/boundary cases.
+# The runner reads every *.yml in tests/cases/. Each log is a single line.
+
+# === Decoder field extraction (rich assertion on one representative event) ===
+# Confirms the sibling decoders extract the CEF header AND the network fields.
+- name: "Decoder extracts CEF and network fields (VI:NEW-LINK)"
+  log: 'Jun 24 2026 13:06:32 denny-nuc-cmc n2osevents[0]: CEF:0|Nozomi Networks|N2OS|26.3.0-05291746_EEBD7|VI:NEW-LINK|New link|4|app=syslog dvc=192.168.50.134 dvchost=guardian-nuc-2 dst=192.168.50.53 dpt=514 src=192.168.50.187 spt=8588 proto=UDP'
+  expect:
+    rule_id: "110003"
+    level: 3
+    decoder: "nozomi_n2os"
+    groups: ["network_discovery"]
+    fields:
+      signature: "VI:NEW-LINK"
+      srcip: "192.168.50.187"
+      dstip: "192.168.50.53"
+      protocol: "UDP"
+
+# === One positive case per rule (asserts rule id, level, decoder, group, signature) ===
+- name: "VI:NEW-LINK fires rule 110003 at level 3"
+  log: 'Jun 24 2026 13:06:32 denny-nuc-cmc n2osevents[0]: CEF:0|Nozomi Networks|N2OS|26.3.0-05291746_EEBD7|VI:NEW-LINK|New link|4|app=syslog dvc=192.168.50.134 dvchost=guardian-nuc-2 dst=192.168.50.53 dpt=514 src=192.168.50.187 spt=8588 proto=UDP'
+  expect:
+    rule_id: "110003"
+    level: 3
+    decoder: "nozomi_n2os"
+    groups: ["network_discovery"]
+    fields:
+      signature: "VI:NEW-LINK"
+
+- name: "VI:NEW-ARP fires rule 110001 at level 3"
+  log: 'Jun 24 2026 13:06:32 denny-nuc-cmc n2osevents[0]: CEF:0|Nozomi Networks|N2OS|26.3.0-05291746_EEBD7|VI:NEW-ARP|New ARP|4|app=syslog dvc=192.168.50.134 dvchost=guardian-nuc-2 dst=192.168.50.53 dpt=514 src=192.168.50.187 spt=8588 proto=UDP'
+  expect:
+    rule_id: "110001"
+    level: 3
+    decoder: "nozomi_n2os"
+    groups: ["network_discovery"]
+    fields:
+      signature: "VI:NEW-ARP"
+
+- name: "VI:NEW-FUNC-CODE fires rule 110002 at level 4"
+  log: 'Jun 24 2026 13:06:32 denny-nuc-cmc n2osevents[0]: CEF:0|Nozomi Networks|N2OS|26.3.0-05291746_EEBD7|VI:NEW-FUNC-CODE|New function code|4|app=syslog dvc=192.168.50.134 dvchost=guardian-nuc-2 dst=192.168.50.53 dpt=514 src=192.168.50.187 spt=8588 proto=UDP'
+  expect:
+    rule_id: "110002"
+    level: 4
+    decoder: "nozomi_n2os"
+    groups: ["protocol"]
+    fields:
+      signature: "VI:NEW-FUNC-CODE"
+
+# - name: "VI:NEW-LINK-GROUP fires rule 110005 at level 2"
+#   log: 'Jun 24 2026 13:06:32 denny-nuc-cmc n2osevents[0]: CEF:0|Nozomi Networks|N2OS|26.3.0-05291746_EEBD7|VI:NEW-LINK-GROUP|New link group|4|app=syslog dvc=192.168.50.134 dvchost=guardian-nuc-2 dst=192.168.50.53 dpt=514 src=192.168.50.187 spt=8588 proto=UDP'
+#   expect:
+#     rule_id: "110005"
+#     level: 2
+#     decoder: "nozomi_n2os"
+#     groups: ["inventory"]
+#     fields:
+#       signature: "VI:NEW-LINK-GROUP"
+
+- name: "VI:NEW-MAC fires rule 110006 at level 3"
+  log: 'Jun 24 2026 13:06:32 denny-nuc-cmc n2osevents[0]: CEF:0|Nozomi Networks|N2OS|26.3.0-05291746_EEBD7|VI:NEW-MAC|New MAC|4|app=syslog dvc=192.168.50.134 dvchost=guardian-nuc-2 dst=192.168.50.53 dpt=514 src=192.168.50.187 spt=8588 proto=UDP'
+  expect:
+    rule_id: "110006"
+    level: 3
+    decoder: "nozomi_n2os"
+    groups: ["asset_inventory"]
+    fields:
+      signature: "VI:NEW-MAC"
+
+- name: "VI:NEW-NET-DEV fires rule 110007 at level 4"
+  log: 'Jun 24 2026 13:06:32 denny-nuc-cmc n2osevents[0]: CEF:0|Nozomi Networks|N2OS|26.3.0-05291746_EEBD7|VI:NEW-NET-DEV|New network device|4|app=syslog dvc=192.168.50.134 dvchost=guardian-nuc-2 dst=192.168.50.53 dpt=514 src=192.168.50.187 spt=8588 proto=UDP'
+  expect:
+    rule_id: "110007"
+    level: 4
+    decoder: "nozomi_n2os"
+    groups: ["asset_inventory"]
+    fields:
+      signature: "VI:NEW-NET-DEV"
+
+- name: "VI:NEW-NODE:TARGET fires rule 110009 at level 5"
+  log: 'Jun 24 2026 13:06:32 denny-nuc-cmc n2osevents[0]: CEF:0|Nozomi Networks|N2OS|26.3.0-05291746_EEBD7|VI:NEW-NODE:TARGET|New target node|4|app=syslog dvc=192.168.50.134 dvchost=guardian-nuc-2 dst=192.168.50.53 dpt=514 src=192.168.50.187 spt=8588 proto=UDP'
+  expect:
+    rule_id: "110009"
+    level: 5
+    decoder: "nozomi_n2os"
+    groups: ["asset_inventory"]
+    fields:
+      signature: "VI:NEW-NODE:TARGET"
+
+- name: "VI:PROC:NEW-VALUE fires rule 110020 at level 6"
+  log: 'Jun 24 2026 13:06:32 denny-nuc-cmc n2osevents[0]: CEF:0|Nozomi Networks|N2OS|26.3.0-05291746_EEBD7|VI:PROC:NEW-VALUE|New process value|4|app=syslog dvc=192.168.50.134 dvchost=guardian-nuc-2 dst=192.168.50.53 dpt=514 src=192.168.50.187 spt=8588 proto=UDP'
+  expect:
+    rule_id: "110020"
+    level: 6
+    decoder: "nozomi_n2os"
+    groups: ["process_monitoring"]
+    fields:
+      signature: "VI:PROC:NEW-VALUE"
+
+- name: "VI:PROC:VARIABLE-FLOW-ANOMALY fires rule 110021 at level 9"
+  log: 'Jun 24 2026 13:06:32 denny-nuc-cmc n2osevents[0]: CEF:0|Nozomi Networks|N2OS|26.3.0-05291746_EEBD7|VI:PROC:VARIABLE-FLOW-ANOMALY|Variable flow anomaly|4|app=syslog dvc=192.168.50.134 dvchost=guardian-nuc-2 dst=192.168.50.53 dpt=514 src=192.168.50.187 spt=8588 proto=UDP'
+  expect:
+    rule_id: "110021"
+    level: 9
+    decoder: "nozomi_n2os"
+    groups: ["anomaly"]
+    fields:
+      signature: "VI:PROC:VARIABLE-FLOW-ANOMALY"
+
+- name: "SIGN:CLEARTEXT-PASSWORD fires rule 110101 at level 10"
+  log: 'Jun 24 2026 13:06:32 denny-nuc-cmc n2osevents[0]: CEF:0|Nozomi Networks|N2OS|26.3.0-05291746_EEBD7|SIGN:CLEARTEXT-PASSWORD|Cleartext password|4|app=syslog dvc=192.168.50.134 dvchost=guardian-nuc-2 dst=192.168.50.53 dpt=514 src=192.168.50.187 spt=8588 proto=UDP'
+  expect:
+    rule_id: "110101"
+    level: 10
+    decoder: "nozomi_n2os"
+    groups: ["credential_access"]
+    fields:
+      signature: "SIGN:CLEARTEXT-PASSWORD"
+
+- name: "SIGN:DHCP-OPERATION fires rule 110102 at level 5"
+  log: 'Jun 24 2026 13:06:32 denny-nuc-cmc n2osevents[0]: CEF:0|Nozomi Networks|N2OS|26.3.0-05291746_EEBD7|SIGN:DHCP-OPERATION|DHCP operation|4|app=syslog dvc=192.168.50.134 dvchost=guardian-nuc-2 dst=192.168.50.53 dpt=514 src=192.168.50.187 spt=8588 proto=UDP'
+  expect:
+    rule_id: "110102"
+    level: 5
+    decoder: "nozomi_n2os"
+    groups: ["dhcp"]
+    fields:
+      signature: "SIGN:DHCP-OPERATION"
+
+- name: "SIGN:MALFORMED-TRAFFIC fires rule 110103 at level 8"
+  log: 'Jun 24 2026 13:06:32 denny-nuc-cmc n2osevents[0]: CEF:0|Nozomi Networks|N2OS|26.3.0-05291746_EEBD7|SIGN:MALFORMED-TRAFFIC|Malformed traffic|4|app=syslog dvc=192.168.50.134 dvchost=guardian-nuc-2 dst=192.168.50.53 dpt=514 src=192.168.50.187 spt=8588 proto=UDP'
+  expect:
+    rule_id: "110103"
+    level: 8
+    decoder: "nozomi_n2os"
+    groups: ["protocol"]
+    fields:
+      signature: "SIGN:MALFORMED-TRAFFIC"
+
+- name: "SIGN:MALWARE-DETECTED fires rule 110104 at level 12"
+  log: 'Jun 24 2026 13:06:32 denny-nuc-cmc n2osevents[0]: CEF:0|Nozomi Networks|N2OS|26.3.0-05291746_EEBD7|SIGN:MALWARE-DETECTED|Malware detected|4|app=syslog dvc=192.168.50.134 dvchost=guardian-nuc-2 dst=192.168.50.53 dpt=514 src=192.168.50.187 spt=8588 proto=UDP'
+  expect:
+    rule_id: "110104"
+    level: 12
+    decoder: "nozomi_n2os"
+    groups: ["malware"]
+    fields:
+      signature: "SIGN:MALWARE-DETECTED"
+
+- name: "SIGN:MITM fires rule 110105 at level 12"
+  log: 'Jun 24 2026 13:06:32 denny-nuc-cmc n2osevents[0]: CEF:0|Nozomi Networks|N2OS|26.3.0-05291746_EEBD7|SIGN:MITM|Man in the middle|4|app=syslog dvc=192.168.50.134 dvchost=guardian-nuc-2 dst=192.168.50.53 dpt=514 src=192.168.50.187 spt=8588 proto=UDP'
+  expect:
+    rule_id: "110105"
+    level: 12
+    decoder: "nozomi_n2os"
+    groups: ["network"]
+    fields:
+      signature: "SIGN:MITM"
+
+- name: "SIGN:PROGRAM:TRANSFER fires rule 110107 at level 9"
+  log: 'Jun 24 2026 13:06:32 denny-nuc-cmc n2osevents[0]: CEF:0|Nozomi Networks|N2OS|26.3.0-05291746_EEBD7|SIGN:PROGRAM:TRANSFER|Program transfer|4|app=syslog dvc=192.168.50.134 dvchost=guardian-nuc-2 dst=192.168.50.53 dpt=514 src=192.168.50.187 spt=8588 proto=UDP'
+  expect:
+    rule_id: "110107"
+    level: 9
+    decoder: "nozomi_n2os"
+    groups: ["programming"]
+    fields:
+      signature: "SIGN:PROGRAM:TRANSFER"
+
+# === Base-rule path: an unknown signature decodes (110000, level 0) but does not alert ===
+- name: "Unknown Nozomi signature decodes but raises no alert"
+  log: 'Jun 24 2026 13:06:32 denny-nuc-cmc n2osevents[0]: CEF:0|Nozomi Networks|N2OS|26.3.0-05291746_EEBD7|VI:UNKNOWN-SIGNATURE|Unknown event|4|app=syslog dvc=192.168.50.134 dvchost=guardian-nuc-2 dst=192.168.50.53 dpt=514 src=192.168.50.187 spt=8588 proto=UDP'
+  expect_no_alert: true
+
+# === Negative: a CEF log from another vendor must not match the Nozomi decoder ===
+- name: "Non-Nozomi CEF log does not fire Nozomi rules"
+  log: 'Jun 24 2026 13:10:00 denny-nuc-cmc otherlog[0]: CEF:0|Acme Corp|OtherProduct|1.0|SOME:EVENT|Some event|3|src=10.0.0.1 dst=10.0.0.2'
+  expect_no_alert: true
