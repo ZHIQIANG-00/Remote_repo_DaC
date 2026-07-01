@@ -241,7 +241,6 @@ _CTX = ssl.create_default_context()
 _CTX.check_hostname = False
 _CTX.verify_mode = ssl.CERT_NONE
 
-
 def _request(method, path, token=None, basic=None, body=None):
     url = API + path
     data = json.dumps(body).encode() if body is not None else None
