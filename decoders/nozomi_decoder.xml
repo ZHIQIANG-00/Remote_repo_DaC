@@ -1,0 +1,49 @@
+<!-- Jun 24 2026 13:06:32 denny-nuc-cmc n2osevents[0]: CEF:0|Nozomi Networks|N2OS|26.3.0-05291746_EEBD7|VI:NEW-LINK|New link|4|app=syslog dvc=192.168.50.134 dvchost=guardian-nuc-2 cs1=4.0 cs2=true cs3=42ab1ca4-280c-45d1-98c5-1d55d92e964e cs5=["77cbcd52-eae4-49fb-8996-5d54f9f17454"] cs6=3 cs1Label=Risk cs2Label=IsSecurity cs3Label=Id cs5Label=Parents cs6Label=n2os_schema dst=192.168.50.53 dhost=wazuh-server dmac=00:0c:29:e9:0c:cd dpt=514 flexString3=New link flexString3Label=Name msg=New link syslog between 192.168.50.187 and 192.168.50.53 src=192.168.50.187 smac=00:0c:29:17:2a:d0 spt=8588 proto=UDP start=1782306392145-->
+
+
+<decoder name="nozomi_n2os">
+  <type>syslog</type>
+  <prematch>CEF:0\|Nozomi Networks\|N2OS\|</prematch>
+</decoder>
+
+<decoder name="nozomi_n2os_fields"> 
+  <parent>nozomi_n2os</parent> 
+  <regex type="pcre2">CEF:([0-9]+)\|Nozomi Networks\|N2OS\|([^|]+)\|([^|]+)\|([^|]+)\|([0-9]+)\|</regex> 
+  <order>cef_version, product_version, signature, event_name, severity</order> 
+</decoder>
+
+<decoder name="nozomi_n2os_fields">
+    <parent>nozomi_n2os</parent>
+    <regex type="pcre2">app=([^\s]+)\s+dvc=([0-9.]+)\s+dvchost=([^\s]+)</regex>
+    <order>app,device_ip,device_hostname</order>
+</decoder>
+
+<decoder name="nozomi_n2os_fields">
+    <parent>nozomi_n2os</parent>
+    <regex type="pcre2">cs1=([^\s]+)\s+cs2=([^\s]+)\s+cs3=([^\s]+)</regex>
+    <order>risk, is_security, event_id</order>
+</decoder>
+
+<decoder name="nozomi_n2os_fields">
+    <parent>nozomi_n2os</parent>
+    <regex type="pcre2">cs5=\["([^"]+)"</regex>
+    <order>parent_id</order>
+</decoder>
+
+<decoder name="nozomi_n2os_fields">
+    <parent>nozomi_n2os</parent>
+    <regex type="pcre2">dst=([0-9.]+).*dpt=([0-9]+).*src=([0-9.]+).*spt=([0-9]+).*proto=([A-Za-z]+)</regex>
+    <order>dstip,dstport,srcip,srcport,protocol</order>
+</decoder>
+
+<decoder name="nozomi_n2os_fields">
+    <parent>nozomi_n2os</parent>
+    <regex type="pcre2">dhost=([^\s]+).*dmac=([0-9A-Fa-f:]+).*smac=([0-9A-Fa-f:]+)</regex>
+    <order>dsthost,dstmac,srcmac</order>
+</decoder>
+
+<decoder name="nozomi_n2os_fields">
+    <parent>nozomi_n2os</parent>
+    <regex type="pcre2">msg=(.*?)\s+src</regex>
+    <order>message</order>
+</decoder>

@@ -36,12 +36,6 @@
 
 
 # --- Custom-rule example -----------------------------------------------------
-# Uncomment once rules/local_rules.xml defines rule 100001 (failed SSH from a
-# blacklisted IP). This is the kind of assertion that catches a regression when
-# someone edits the rule and accidentally breaks the match.
-#
-# - name: "Failed SSH from blacklisted IP raises custom 100001"
-#   log: "Oct 15 21:11:00 linux-agent sshd[29400]: Failed password for invalid user admin from 1.1.1.1 port 50999 ssh2"
-#   expect:
-#     rule_id: "100001"
-#     min_level: 7
+# Nozomi decoder & Rules
+
+
