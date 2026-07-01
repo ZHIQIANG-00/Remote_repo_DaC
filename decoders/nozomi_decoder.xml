@@ -12,6 +12,7 @@
   <order>cef_version, product_version, signature, event_name, severity</order> 
 </decoder>
 
+
 <decoder name="nozomi_n2os_fields">
     <parent>nozomi_n2os</parent>
     <regex type="pcre2">app=([^\s]+)\s+dvc=([0-9.]+)\s+dvchost=([^\s]+)</regex>

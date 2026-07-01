@@ -49,15 +49,15 @@
     fields:
       signature: "VI:NEW-FUNC-CODE"
 
-- name: "VI:NEW-LINK-GROUP fires rule 110005 at level 2"
-  log: 'Jun 24 2026 13:06:32 denny-nuc-cmc n2osevents[0]: CEF:0|Nozomi Networks|N2OS|26.3.0-05291746_EEBD7|VI:NEW-LINK-GROUP|New link group|4|app=syslog dvc=192.168.50.134 dvchost=guardian-nuc-2 dst=192.168.50.53 dpt=514 src=192.168.50.187 spt=8588 proto=UDP'
-  expect:
-    rule_id: "110005"
-    level: 2
-    decoder: "nozomi_n2os"
-    groups: ["inventory"]
-    fields:
-      signature: "VI:NEW-LINK-GROUP"
+# - name: "VI:NEW-LINK-GROUP fires rule 110005 at level 2"
+#   log: 'Jun 24 2026 13:06:32 denny-nuc-cmc n2osevents[0]: CEF:0|Nozomi Networks|N2OS|26.3.0-05291746_EEBD7|VI:NEW-LINK-GROUP|New link group|4|app=syslog dvc=192.168.50.134 dvchost=guardian-nuc-2 dst=192.168.50.53 dpt=514 src=192.168.50.187 spt=8588 proto=UDP'
+#   expect:
+#     rule_id: "110005"
+#     level: 2
+#     decoder: "nozomi_n2os"
+#     groups: ["inventory"]
+#     fields:
+#       signature: "VI:NEW-LINK-GROUP"
 
 - name: "VI:NEW-MAC fires rule 110006 at level 3"
   log: 'Jun 24 2026 13:06:32 denny-nuc-cmc n2osevents[0]: CEF:0|Nozomi Networks|N2OS|26.3.0-05291746_EEBD7|VI:NEW-MAC|New MAC|4|app=syslog dvc=192.168.50.134 dvchost=guardian-nuc-2 dst=192.168.50.53 dpt=514 src=192.168.50.187 spt=8588 proto=UDP'

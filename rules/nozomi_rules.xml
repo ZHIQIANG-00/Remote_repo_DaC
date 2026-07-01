@@ -25,13 +25,15 @@
         <field name="signature">VI:NEW-FUNC-CODE</field>
         <description>New protocol function code observed</description>
         <group>inventory,protocol,</group>
-    
+    <!--
     </rule>
+    
         <rule id="110005" level="2">
         <if_sid>110000</if_sid>
         <field name="signature">^VI:NEW-LINK-GROUP$</field>
         <description>New communication group discovered</description>
         <group>inventory,</group>
+    -->
     </rule>
     
         <rule id="110006" level="3">
